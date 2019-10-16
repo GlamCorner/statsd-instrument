@@ -165,6 +165,12 @@ class UDPBackendTest < Minitest::Test
     StatsD.key_value('fooy', 42)
   end
 
+  def test_support_tags_syntax_on_cloudwatch
+    @backend.implementation = :cloudwatch
+    @backend.expects(:write_packet).with("fooc:3|c|#topic:foo,bar")
+    StatsD.increment('fooc', 3, tags: ['topic:foo', 'bar'])
+  end
+
   # For key_value metrics (only supported by statsite), the sample rate
   # part of the datagram format is (ab)used to be set to a timestamp instead.
   # Changing that to `sample_rate: timestamp` does not make sense, so we
